@@ -11,6 +11,7 @@ if (!(Test-Path $File_LOG)) {
 Clear-Content $File_LOG
 $DATE = Get-Date -UFormat "%Y/%m/%d %H:%M:%S"
 Write-Output "==> $DATE" | Tee-Object $File_LOG -Append
+Write-Output "==> $File_LOG" | Tee-Object $File_LOG -Append
 
 ### Load config file
 Try {
@@ -46,11 +47,12 @@ if (($what_ip -eq "internal") -and ($proxied)) {
   Exit
 }
 
-### Get External ip from https://checkip.amazonaws.com
+### Get External ip from https://forge.speedtest.cn/api/location/info
 if ($what_ip -eq 'external') {
-  $ip = (Invoke-RestMethod -Uri "https://checkip.amazonaws.com" -TimeoutSec 10).Trim()
+  $response = Invoke-RestMethod -Uri "https://forge.speedtest.cn/api/location/info" -TimeoutSec 10
+  $ip = $response.ip
   if (!([bool]$ip)) {
-    Write-Output "Error! Can't get external ip from https://checkip.amazonaws.com" | Tee-Object $File_LOG -Append
+    Write-Output "Error! Can't get external ip from https://forge.speedtest.cn/api/location/info" | Tee-Object $File_LOG -Append
     Exit
   }
   Write-Output "==> External IP is: $ip" | Tee-Object $File_LOG -Append
